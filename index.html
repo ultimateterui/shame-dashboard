@@ -3,125 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Crypto Wall of Shame</title>
+    <title>The Global Crypto Wall of Shame</title>
+    <!-- Official Solana Web3 Integration -->
     <script src="https://unpkg.com"></script>
     <style>
-        body { background-color: #0d0d0d; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 40px; }
-        .box { border: 2px solid #ff3333; padding: 20px; max-width: 500px; margin: 0 auto; border-radius: 8px; background: #1a1a1a; }
-        button { background-color: #9945FF; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 15px; }
-        button:hover { background-color: #14F195; color: #000; }
-        input { padding: 10px; width: 80%; margin-top: 10px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; text-align: center; }
-        .leaderboard { margin-top: 40px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
-        .item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
-        .rank-1 { color: #14F195; font-weight: bold; font-size: 20px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #050505; color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; line-height: 1.6; }
+        
+        /* Master Layout Container */
+        .container { max-width: 800px; margin: 0 auto; padding-top: 40px; }
+        
+        /* Main Header Structure */
+        header { text-align: center; margin-bottom: 50px; }
+        header h1 { font-size: 3rem; font-weight: 900; letter-spacing: -1px; color: #ff3333; text-transform: uppercase; margin-bottom: 10px; }
+        header p { color: #888; font-size: 1.1rem; }
+
+        /* HERO SECTION: Giant Leaderboard First */
+        .leaderboard-section { background: linear-gradient(180deg, #111 0%, #0a0a0a 100%); border: 1px solid #222; border-radius: 16px; padding: 30px; margin-bottom: 60px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .leaderboard-section h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 25px; border-bottom: 1px solid #222; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .leaderboard-section h2 span { color: #14F195; font-size: 0.9rem; font-weight: 400; background: rgba(20,241,149,0.1); padding: 4px 12px; border-radius: 20px; }
+        
+        /* Scoreboard Rows */
+        .board-list { display: flex; flex-direction: column; gap: 12px; }
+        .row-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; border-radius: 12px; transition: all 0.3s ease; }
+        .row-item:hover { border-color: #333; background: rgba(255,255,255,0.04); }
+        
+        /* Dynamic Styling for Rank 1 */
+        .rank-1 { background: linear-gradient(90deg, rgba(153,69,253,0.1) 0%, rgba(20,241,149,0.05) 100%); border: 1px solid #9945FF; box-shadow: 0 0 20px rgba(153,69,253,0.15); }
+        .rank-1 .user-title { color: #14F195; font-weight: 800; font-size: 1.3rem; }
+        .rank-1 .amount-badge { background: #14F195; color: #000; font-weight: 900; }
+
+        .meta-info { display: flex; flex-direction: column; gap: 4px; }
+        .user-title { font-weight: 700; font-size: 1.1rem; }
+        .user-desc { color: #aaa; font-size: 0.95rem; max-width: 500px; word-wrap: break-word; }
+        
+        .amount-badge { background: #222; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-family: monospace; font-size: 1rem; }
+
+        /* CALL TO ACTION SECTION: User must scroll down to see this */
+        .payment-section { background: #0f0f0f; border: 1px dashed #333; border-radius: 16px; padding: 40px 30px; text-align: center; margin-bottom: 100px; }
+        .payment-section h3 { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+        .payment-section .subtitle { color: #666; margin-bottom: 25px; font-size: 0.95rem; }
+        
+        /* Professional Input Fields */
+        .form-group { max-width: 450px; margin: 0 auto 15px auto; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; color: #888; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, textarea { width: 100%; padding: 14px; background: #161616; border: 1px solid #252525; border-radius: 8px; color: #fff; font-size: 1rem; font-family: inherit; transition: all 0.2s ease; }
+        input:focus, textarea:focus { outline: none; border-color: #9945FF; background: #1a1a1a; }
+        textarea { resize: none; height: 80px; }
+        
+        .char-counter { font-size: 0.8rem; color: #555; text-align: right; margin-top: 4px; }
+        
+        /* Interaction Buttons */
+        .btn { display: inline-block; width: 100%; max-width: 450px; padding: 16px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease; margin-top: 10px; }
+        .btn-connect { background-color: #9945FF; color: #fff; }
+        .btn-connect:hover { background-color: #8032e6; transform: translateY(-1px); }
+        .btn-pay { background-color: #14F195; color: #000; display: none; }
+        .btn-pay:hover { background-color: #10d481; transform: translateY(-1px); }
+        
+        #wallet-display { font-family: monospace; color: #666; font-size: 0.85rem; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
-    <h1>⚠️ THE CRYPTO WALL OF SHAME ⚠️</h1>
-    <p>The highest bidder controls Rank 1. Completely automated via Solana blockchain.</p>
+    <div class="container">
+        <!-- Main Top Header -->
+        <header>
+            <h1>The Wall of Shame</h1>
+            <p>The ultimate ledger of the internet's worst crypto tragedies.</p>
+        </header>
 
-    <div class="box">
-        <h3 id="wallet-status">Wallet Not Connected</h3>
-        <button id="btn-connect" onclick="connectWallet()">1. CONNECT PHANTOM</button>
-        <br><br>
-        <input type="text" id="target-username" placeholder="Enter X Handle or Token Name to Shame">
-        <input type="number" id="payment-amount" placeholder="Amount in SOL (e.g. 0.05)" step="0.01">
-        <br>
-        <button id="btn-pay" onclick="sendPayment()" style="background-color: #14F195; color: black;">2. PUSH TO LEADERBOARD</button>
-    </div>
+        <!-- FRONT & CENTER: The Big Ranking Dashboard -->
+        <section class="leaderboard-section">
+            <h2>Live Scoreboard <span id="top-threshold">Min to take Rank 1: 0.013 SOL</span></h2>
+            <div class="board-list" id="board-container">
+                <!-- Sorted entries render here dynamically -->
+            </div>
+        </section>
 
-    <div class="leaderboard">
-        <h2>🏆 LIVE LEADERBOARD</h2>
-        <div id="board-content">
-            <!-- Ranks will display here automatically -->
-        </div>
+        <!-- LOWER SECTION: Payment and Input Panel -->
+        <section class="payment-section">
+            <h3>Immortalize a Financial Disaster</h3>
+            <p class="subtitle">Connect your Phantom wallet to submit a name and claim your rank.</p>
+            
+            <!-- Step 1 Button -->
+            <button id="btn-connect" class="btn btn-connect" onclick="connectPhantom()">Connect Phantom Wallet</button>
+            <div id="wallet-display">Not Connected</div>
+
+            <!-- Step 2 Inputs: Hidden layout flow variables handled below -->
+            <div id="submission-fields" style="display:none; margin-top: 25px;">
+                <div class="form-group">
+                    <label>Target Identity (X Handle or Token)</label>
+                    <input type="text" id="input-name" placeholder="e.g., @TraderBozo or $RUGTOKEN">
+                </div>
+                
+                <div class="form-group">
+                    <label>The Situation (Max 100 Characters)</label>
+                    <textarea id="input-desc" maxlength="100" oninput="updateCounter()" placeholder="What did they do? How did they lose it?"></textarea>
+                    <div class="char-counter"><span id="char-count">0</span> / 100</div>
+                </div>
+
+                <div class="form-group">
+                    <label id="amount-label">Bid Amount (Minimum 0.012 SOL)</label>
+                    <input type="number" id="input-amount" placeholder="0.012" step="0.001" min="0.012">
+                </div>
+
+                <button id="btn-pay" class="btn btn-pay" onclick="processBid()">Submit to Blockchain</button>
+            </div>
+        </section>
     </div>
 
     <script>
-        const RECIPIENT_WALLET = "F6aX6zQj9bfCyWrDLPZAjLqkwRY7FC8HqWCZRFpWdsZr"; // 👈 PASTE YOUR PHANTOM PUBLIC KEY HERE
-        let userWallet = null;
-        let leaderboardData = [
-            { name: "@CryptoGuru_X", amount: 0.15, note: "Bought the top of a meme coin." },
-            { name: "@John_Trades_99", amount: 0.10, note: "Fell asleep during launch." },
-            { name: "$BOZO Token", amount: 0.05, note: "Dev rugged in 4 minutes." }
+        // REPLACE THE STRING BELOW WITH YOUR ACTUAL PHANTOM SOLANA PUBLIC KEY
+        const TARGET_DESTINATION = "F6aX6zQj9bfCyWrDLPZAjLqkwRY7FC8HqWCZRFpWdsZr"; 
+        
+        const MIN_ENTRY_SOL = 0.012; // Flat $2 translation approximation floor
+        let userWalletAddress = null;
+
+        // Preloaded placeholder array structured to demonstrate interactive functionality immediately
+        let memoryDb = [
+            { name: "@AlphaRider", desc: "Bought a token at all-time high using 50x leverage. Liquidated in 45 seconds.", amount: 0.120 },
+            { name: "@SolWhale_99", desc: "Sent 50 SOL to a presale wallet address found on an unverified anonymous thread.", amount: 0.085 },
+            { name: "$DUMBO Coin", desc: "Developer deleted the Telegram channel and pulled the liquidity pool mid-stream.", amount: 0.012 }
         ];
 
-        // Automatic Detection and Connection to Phantom
-        async function connectWallet() {
-            if (window.solana && window.solana.isPhantom) {
-                try {
-                    const response = await window.solana.connect();
-                    userWallet = response.publicKey.toString();
-                    document.getElementById("wallet-status").innerText = "Connected: " + userWallet.substring(0,6) + "..." + userWallet.substring(userWallet.length-4);
-                    document.getElementById("btn-connect").style.display = "none";
-                } catch (err) {
-                    alert("Connection rejected.");
-                }
-            } else {
-                alert("Phantom Wallet not found. Please open this site inside the Phantom App browser or Brave with Phantom Extension.");
-            }
-        }
-
-        // Handle Automated Secure Payment via Phantom Link
-        async function sendPayment() {
-            if (!userWallet) { alert("Please connect your Phantom wallet first!"); return; }
-            const username = document.getElementById("target-username").value;
-            const amount = parseFloat(document.getElementById("payment-amount").value);
-            
-            if (!username || isNaN(amount) || amount <= 0) { alert("Please enter a valid username and SOL amount."); return; }
-
-            try {
-                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
-                const transaction = new solanaWeb3.Transaction().add(
-                    solanaWeb3.SystemProgram.transfer({
-                        fromPubkey: window.solana.publicKey,
-                        toPubkey: new solanaWeb3.PublicKey(RECIPIENT_WALLET),
-                        lamports: amount * solanaWeb3.LAMPORTS_PER_SOL
-                    })
-                );
-
-                transaction.recentBlockhash = (await connection.getRecentLatestBlockhash ? await connection.getRecentLatestBlockhash() : await connection.getRecentBlockhash()).blockhash;
-                transaction.feePayer = window.solana.publicKey;
-
-                let signed = await window.solana.signTransaction(transaction);
-                let signature = await connection.sendRawTransaction(signed.serialize());
-                
-                alert("Payment sent! Verifying transaction...");
-                
-                // Instantly update the front-end layout rank display 
-                leaderboardData.push({ name: username, amount: amount, note: "Community Voted Shame." });
-                renderLeaderboard();
-                
-            } catch (err) {
-                console.error(err);
-                alert("Transaction failed or canceled.");
-            }
-        }
-
-        // Automatic Sorting Logic: Highest to Lowest Payout
-        function renderLeaderboard() {
-            leaderboardData.sort((a, b) => b.amount - a.amount);
-            const container = document.getElementById("board-content");
+        // Renders visual dashboard items ordered exactly from highest financial value to lowest
+        function refreshDashboard() {
+            memoryDb.sort((x, y) => y.amount - x.amount);
+            const container = document.getElementById("board-container");
             container.innerHTML = "";
-            
-            leaderboardData.forEach((item, index) => {
-                const rank = index + 1;
-                let classRank = rank === 1 ? "item rank-1" : "item";
-                let medal = rank === 1 ? "🥇 " : rank === 2 ? "🥈 " : rank === 3 ? "🥉 " : rank + ". ";
-                
+
+            memoryDb.forEach((item, index) => {
+                const currentRank = index + 1;
+                let isTop = currentRank === 1;
+                let layoutClass = isTop ? "row-item rank-1" : "row-item";
+                let medalPrefix = currentRank === 1 ? "🥇 " : currentRank === 2 ? "🥈 " : currentRank === 3 ? "🥉 " : `${currentRank}. `;
+
                 container.innerHTML += `
-                    <div class="${classRank}">
-                        <span>${medal} <b>${item.name}</b> (${item.note})</span>
-                        <span><b>${item.amount} SOL</b></span>
+                    <div class="${layoutClass}">
+                        <div class="meta-info">
+                            <span class="user-title">${medalPrefix}${item.name}</span>
+                            <span class="user-desc">${item.desc}</span>
+                        </div>
+                        <div class="amount-badge">${item.amount.toFixed(3)} SOL</div>
                     </div>
                 `;
             });
+
+            // Logic to calculate and display the threshold required to steal Rank 1
+            if (memoryDb.length > 0) {
+                const highestBid = memoryDb[0].amount;
+                const nextRequiredBid = highestBid + 0.001;
+                document.getElementById("top-threshold").innerText = `Min to take Rank 1: ${nextRequiredBid.toFixed(3)} SOL`;
+                
+                // Dynamically update form validation guidelines
+                const amountInput = document.getElementById("input-amount");
+                if (amountInput) {
+                    amountInput.placeholder = nextRequiredBid.toFixed(3);
+                }
+            }
         }
 
-        // Load the initial scoreboard layout on startup
-        renderLeaderboard();
-    </script>
-</body>
-</html>
-
+        // Monitors text inputs to prevent character strings from expanding past 100 spaces
+        function updateCounter() {
+            const currentLength = document.getElementById("input-desc").value.length;
+            document.getElementById("char-count").innerText = currentLength;
