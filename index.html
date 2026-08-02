@@ -1,1 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Crypto Wall of Shame</title>
+    <script src="https://unpkg.com"></script>
+    <style>
+        body { background-color: #0d0d0d; color: #fff; font-family: 'Courier New', monospace; text-align: center; padding: 40px; }
+        .box { border: 2px solid #ff3333; padding: 20px; max-width: 500px; margin: 0 auto; border-radius: 8px; background: #1a1a1a; }
+        button { background-color: #9945FF; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 15px; }
+        button:hover { background-color: #14F195; color: #000; }
+        input { padding: 10px; width: 80%; margin-top: 10px; border-radius: 4px; border: 1px solid #444; background: #222; color: white; text-align: center; }
+        .leaderboard { margin-top: 40px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+        .item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; }
+        .rank-1 { color: #14F195; font-weight: bold; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>⚠️ THE CRYPTO WALL OF SHAME ⚠️</h1>
+    <p>The highest bidder controls Rank 1. Completely automated via Solana blockchain.</p>
+
+    <div class="box">
+        <h3 id="wallet-status">Wallet Not Connected</h3>
+        <button id="btn-connect" onclick="connectWallet()">1. CONNECT PHANTOM</button>
+        <br><br>
+        <input type="text" id="target-username" placeholder="Enter X Handle or Token Name to Shame">
+        <input type="number" id="payment-amount" placeholder="Amount in SOL (e.g. 0.05)" step="0.01">
+        <br>
+        <button id="btn-pay" onclick="sendPayment()" style="background-color: #14F195; color: black;">2. PUSH TO LEADERBOARD</button>
+    </div>
+
+    <div class="leaderboard">
+        <h2>🏆 LIVE LEADERBOARD</h2>
+        <div id="board-content">
+            <!-- Ranks will display here automatically -->
+        </div>
+    </div>
+
+    <script>
+        const RECIPIENT_WALLET = "F6aX6zQj9bfCyWrDLPZAjLqkwRY7FC8HqWCZRFpWdsZr"; // 👈 PASTE YOUR PHANTOM PUBLIC KEY HERE
+        let userWallet = null;
+        let leaderboardData = [
+            { name: "@CryptoGuru_X", amount: 0.15, note: "Bought the top of a meme coin." },
+            { name: "@John_Trades_99", amount: 0.10, note: "Fell asleep during launch." },
+            { name: "$BOZO Token", amount: 0.05, note: "Dev rugged in 4 minutes." }
+        ];
+
+        // Automatic Detection and Connection to Phantom
+        async function connectWallet() {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect();
+                    userWallet = response.publicKey.toString();
+                    document.getElementById("wallet-status").innerText = "Connected: " + userWallet.substring(0,6) + "..." + userWallet.substring(userWallet.length-4);
+                    document.getElementById("btn-connect").style.display = "none";
+                } catch (err) {
+                    alert("Connection rejected.");
+                }
+            } else {
+                alert("Phantom Wallet not found. Please open this site inside the Phantom App browser or Brave with Phantom Extension.");
+            }
+        }
+
+        // Handle Automated Secure Payment via Phantom Link
+        async function sendPayment() {
+            if (!userWallet) { alert("Please connect your Phantom wallet first!"); return; }
+            const username = document.getElementById("target-username").value;
+            const amount = parseFloat(document.getElementById("payment-amount").value);
+            
+            if (!username || isNaN(amount) || amount <= 0) { alert("Please enter a valid username and SOL amount."); return; }
+
+            try {
+                const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+                const transaction = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: window.solana.publicKey,
+                        toPubkey: new solanaWeb3.PublicKey(RECIPIENT_WALLET),
+                        lamports: amount * solanaWeb3.LAMPORTS_PER_SOL
+                    })
+                );
+
+                transaction.recentBlockhash = (await connection.getRecentLatestBlockhash ? await connection.getRecentLatestBlockhash() : await connection.getRecentBlockhash()).blockhash;
+                transaction.feePayer = window.solana.publicKey;
+
+                let signed = await window.solana.signTransaction(transaction);
+                let signature = await connection.sendRawTransaction(signed.serialize());
+                
+                alert("Payment sent! Verifying transaction...");
+                
+                // Instantly update the front-end layout rank display 
+                leaderboardData.push({ name: username, amount: amount, note: "Community Voted Shame." });
+                renderLeaderboard();
+                
+            } catch (err) {
+                console.error(err);
+                alert("Transaction failed or canceled.");
+            }
+        }
+
+        // Automatic Sorting Logic: Highest to Lowest Payout
+        function renderLeaderboard() {
+            leaderboardData.sort((a, b) => b.amount - a.amount);
+            const container = document.getElementById("board-content");
+            container.innerHTML = "";
+            
+            leaderboardData.forEach((item, index) => {
+                const rank = index + 1;
+                let classRank = rank === 1 ? "item rank-1" : "item";
+                let medal = rank === 1 ? "🥇 " : rank === 2 ? "🥈 " : rank === 3 ? "🥉 " : rank + ". ";
+                
+                container.innerHTML += `
+                    <div class="${classRank}">
+                        <span>${medal} <b>${item.name}</b> (${item.note})</span>
+                        <span><b>${item.amount} SOL</b></span>
+                    </div>
+                `;
+            });
+        }
+
+        // Load the initial scoreboard layout on startup
+        renderLeaderboard();
+    </script>
+</body>
+</html>
 
